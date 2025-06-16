@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基隆協和四接議題探討</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .tab-active {
+            border-bottom-color: #f59e0b; /* amber-500 */
+            color: #b45309; /* amber-700 */
+            font-weight: 700;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+    <!-- Chosen Palette: Warm Neutral Ground -->
+    <!-- Application Structure Plan: A tab-based single-page application separating the two core arguments ("Military Security" and "Environmental/Energy") for clarity and focused user engagement. The "Security" tab features an interactive HTML/CSS diagram of the area, while the "Environment" tab uses a Chart.js visualization. This structure prevents information overload and translates the user's A/B-side flyer concept into a logical, interactive web experience. -->
+    <!-- Visualization & Content Choices: 1. Proximity Risk -> Interactive HTML/CSS Diagram: To visually represent spatial threats without using static images or SVG, fulfilling technical constraints while enhancing engagement. 2. CO2 Emissions Data -> Chart.js Bar Chart: To clearly compare historical and projected data, as required. 3. Textual Arguments -> Styled Cards: To present Q&A content in a digestible, modern UI format. 4. External Links -> QR Code Placeholders: To fulfill user requirements for linking to deeper information. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-amber-800">基隆的十字路口：協和四接議題全解析</h1>
+            <p class="mt-2 text-stone-600">一個關乎我們家園安全與未來空氣的選擇</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="mb-8 border-b border-stone-200">
+            <nav class="flex -mb-px" aria-label="Tabs">
+                <button onclick="changeTab('security')" id="tab-security" class="tab-btn tab-active w-1/2 py-4 px-1 text-center border-b-2 font-medium text-lg leading-5 focus:outline-none transition-colors duration-300 ease-in-out">
+                    軍事安全
+                </button>
+                <button onclick="changeTab('environment')" id="tab-environment" class="tab-btn text-stone-500 w-1/2 py-4 px-1 text-center border-b-2 border-transparent font-medium text-lg leading-5 hover:text-amber-600 hover:border-amber-300 focus:outline-none transition-colors duration-300 ease-in-out">
+                    環境能源
+                </button>
+            </nav>
+        </div>
+
+        <!-- Content Sections -->
+        <main>
+            <!-- Security Section -->
+            <section id="content-security" class="space-y-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <p class="text-stone-700 leading-relaxed">本區旨在探討協和第四天然氣接收站（四接）的選址，如何因其與重要軍事設施及民宅的距離過近，而可能引發國防安全上的疑慮與潛在的公共安全風險。我們將透過視覺化圖表與關鍵提問，幫助您了解這個議題的嚴肅性。</p>
+                </div>
+
+                <div class="text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold text-red-700">協和四接 + 軍港軍營 = 軍事焦點！</h2>
+                    <p class="mt-2 text-xl md:text-2xl text-stone-800 font-semibold">基隆港市安全可以完全不評估嗎？</p>
+                </div>
+
+                <!-- Interactive Map Diagram -->
+                <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm">
+                    <h3 class="font-bold text-lg text-center mb-4">設施相對位置示意圖</h3>
+                    <div class="relative w-full h-72 md:h-96 bg-blue-100 rounded-md overflow-hidden border-2 border-blue-300">
+                        <div class="absolute inset-0 bg-blue-100 flex items-center justify-center">
+                            <span class="text-blue-400 font-bold text-2xl opacity-50">基隆港灣區域</span>
+                        </div>
+                        
+                        <!-- LNG Tanks -->
+                        <div id="lng" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-lg bg-red-500 text-white text-sm font-bold shadow-lg z-10 text-center">
+                            天然氣儲槽區<br>(填海造陸)
+                        </div>
+
+                        <!-- Residential Area -->
+                        <div id="homes" class="absolute top-1/3 right-[20%] p-2 rounded-lg bg-yellow-400 text-yellow-900 text-sm font-bold shadow-lg z-10">民宅</div>
+
+                        <!-- Weihai Camp -->
+                        <div id="weihai" class="absolute bottom-[20%] right-[30%] p-2 rounded-lg bg-green-600 text-white text-sm font-bold shadow-lg z-10">威海營區</div>
+
+                        <!-- Neimushan Camp -->
+                        <div id="neimu" class="absolute top-[15%] left-[15%] p-2 rounded-lg bg-green-600 text-white text-sm font-bold shadow-lg z-10">內木山營區</div>
+                        
+                        <!-- Distance Lines (Decorative) -->
+                        <div class="absolute text-xs font-semibold text-red-800" style="top: 28%; left: 55%; transform: rotate(10deg);">
+                            <span class="bg-white/70 px-1 rounded">距民宅約 0.4km</span>
+                        </div>
+                         <div class="absolute text-xs font-semibold text-red-800" style="top: 45%; right: 40%; transform: rotate(-20deg);">
+                           <span class="bg-white/70 px-1 rounded">距威海營區約 1.4km</span>
+                        </div>
+                         <div class="absolute text-xs font-semibold text-red-800" style="top: 20%; left: 35%;">
+                            <span class="bg-white/70 px-1 rounded">距內木山營區約 1.9km</span>
+                        </div>
+                    </div>
+                    <p class="text-center mt-3 text-sm text-stone-500">此為相對位置示意圖，非精確比例尺地圖。</p>
+                </div>
+
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
+                        <h3 class="font-bold text-lg text-red-800 mb-3">Q：台電說天然氣儲槽沒有軍事攻擊價值，你相信嗎？</h3>
+                        <p class="text-stone-700">中共「海峽雷霆」軍演釋出短片，首次模擬攻擊台天然氣接收站。這不僅是環保議題，更是你我生活安全的關鍵問題。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
+                        <h3 class="font-bold text-lg text-red-800 mb-3">Q：台電說天然氣儲槽設施不會爆炸，你相信嗎？</h3>
+                        <p class="text-stone-700">馬來西亞曾發生天然氣管爆炸，導致逾百人傷亡。我們必須思考，如果接收站發生意外，基隆能承受這樣的後果嗎？</p>
+                    </div>
+                </div>
+
+                <div class="text-center p-6 bg-red-100 border border-red-200 rounded-lg">
+                    <h2 class="text-2xl font-bold text-red-800">如果接收站爆炸，我們基隆能承受嗎？</h2>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                    <h3 class="font-bold text-lg mb-2">想了解更多？</h3>
+                    <p class="mb-4 text-stone-600">掃描QR Code，深入了解「為什麼要反對協和四接？」的詳細資訊。</p>
+                    <img src="https://placehold.co/150x150/EEEEEE/333333?text=QR+Code%0A%E6%87%B6%E4%BA%BA%E5%8C%851" alt="QR Code for more information" class="mx-auto rounded-md">
+                    <p class="mt-2 text-xs text-stone-500">*連結至「守護外木山行動小組」臉書粉絲專頁2024/10/06貼文</p>
+                </div>
+
+            </section>
+
+            <!-- Environment Section -->
+            <section id="content-environment" class="hidden space-y-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <p class="text-stone-700 leading-relaxed">本區旨在分析協和電廠「燃油轉燃氣」方案對環境的持續影響。即使改用天然氣，汙染排放依然存在。我們將透過數據圖表呈現未來排放量，並探討地熱發電作為真正潔淨能源替代方案的可能性，為基隆的空氣品質與永續發展尋找更佳出路。</p>
+                </div>
+
+                <div class="text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold text-amber-800">燃油改燃氣仍然有汙染</h2>
+                    <p class="mt-2 text-xl md:text-2xl text-stone-800 font-semibold">協和轉地熱才有好空氣</p>
+                </div>
+                
+                <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm">
+                    <h3 class="font-bold text-lg text-center mb-2">新協和電廠 CO₂ 排放量預估</h3>
+                    <p class="text-center text-sm text-stone-500 mb-4">資料來源: 環境部事業溫室氣體排放量資訊平台及協和四接環說書</p>
+                    <div class="chart-container">
+                        <canvas id="emissionsChart"></canvas>
+                    </div>
+                    <div class="text-center mt-4 p-4 bg-amber-100 border border-amber-200 rounded-lg">
+                       <p class="text-lg font-bold text-amber-900">除了溫室氣體，未來每年仍將有 <span class="text-2xl">1,221</span> 公噸的空氣汙染物排放！</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-amber-500">
+                     <h3 class="font-bold text-xl text-amber-800 mb-4">綠電，才是基隆的未來</h3>
+                     <div class="space-y-3 text-stone-700">
+                        <p><strong class="text-green-700">✓ 台灣不缺電，缺的是「綠電」！</strong></p>
+                        <p>✓ 協和升級成<strong class="text-green-700">地熱發電</strong>，基隆能成為再生能源的領頭羊！</p>
+                        <p>✓ 新瀨海底火山發電潛力達<strong class="text-green-700">50萬瓩</strong>，是穩定可靠的在地能源。</p>
+                        <p>✓ 地熱發電不怕封鎖，能真正提升台灣的<strong class="text-green-700">能源自主</strong>！</p>
+                     </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                    <h3 class="font-bold text-lg mb-2">基隆值得更好的空氣</h3>
+                    <p class="mb-4 text-stone-600">掃描QR Code，了解「基隆忍受空污100年！」的完整故事。</p>
+                    <img src="https://placehold.co/150x150/EEEEEE/333333?text=QR+Code%0A%E6%87%B6%E4%BA%BA%E5%8C%852" alt="QR Code for pollution information" class="mx-auto rounded-md">
+                     <p class="mt-2 text-xs text-stone-500">*連結至「守護外木山行動小組」臉書粉絲專頁2024/10/09貼文</p>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="text-center mt-12 pt-6 border-t border-stone-200">
+            <p class="font-bold">發起單位</p>
+            <p class="text-stone-600 text-sm mt-1">[請在此處列出所有發起單位名稱]</p>
+             <div class="mt-4 inline-block">
+                <img src="https://placehold.co/100x100/EEEEEE/333333?text=LINE%40+QR" alt="Official LINE@" class="mx-auto">
+                <p class="text-sm mt-1">官方LINE@</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const securityTab = document.getElementById('tab-security');
+        const environmentTab = document.getElementById('tab-environment');
+        const securityContent = document.getElementById('content-security');
+        const environmentContent = document.getElementById('content-environment');
+
+        function changeTab(tabName) {
+            if (tabName === 'security') {
+                securityContent.classList.remove('hidden');
+                environmentContent.classList.add('hidden');
+                securityTab.classList.add('tab-active');
+                environmentTab.classList.remove('tab-active');
+            } else if (tabName === 'environment') {
+                securityContent.classList.add('hidden');
+                environmentContent.classList.remove('hidden');
+                securityTab.classList.remove('tab-active');
+                environmentTab.classList.add('tab-active');
+            }
+        }
+
+        const ctx = document.getElementById('emissionsChart').getContext('2d');
+        const emissionsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['109年度', '110年度', '111年度', '112年度', '新協和完工後'],
+                datasets: [{
+                    label: 'CO₂ 排放量 (萬公噸)',
+                    data: [182.8, 245.6, 220.5, 195.0, 623.5],
+                    backgroundColor: [
+                        'rgba(168, 162, 158, 0.6)', // stone-400
+                        'rgba(168, 162, 158, 0.6)',
+                        'rgba(168, 162, 158, 0.6)',
+                        'rgba(168, 162, 158, 0.6)',
+                        'rgba(239, 68, 68, 0.6)' // red-500
+                    ],
+                    borderColor: [
+                        'rgba(120, 113, 108, 1)', // stone-500
+                        'rgba(120, 113, 108, 1)',
+                        'rgba(120, 113, 108, 1)',
+                        'rgba(120, 113, 108, 1)',
+                        'rgba(185, 28, 28, 1)' // red-700
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y + ' 萬公噸';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'CO₂ 排放量 (萬公噸)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            maxRotation: 0,
+                            minRotation: 0
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>
