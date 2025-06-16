@@ -1,20 +1,31 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基隆協和四接議題探討</title>
+    <title>互動式報告：天然氣的真實碳排挑戰</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Soothing & Trustworthy (Customized Neutrals) -->
+    <!-- Application Structure Plan: The SPA follows a narrative flow designed for discovery. It starts with the core conflict (Promise vs. Problem), then dives into an interactive exploration of the main issue (methane leakage tipping point). It then contextualizes the risk for Taiwan (scale-up) and finally presents actionable solutions. This structure guides the user from awareness to understanding to potential action, making it more engaging than a static report. Key interaction is the slider controlling the leakage chart, which allows for hands-on learning. -->
+    <!-- Visualization & Content Choices: 
+        - 2025 Target: Goal: Inform -> Viz: Donut Chart (Chart.js) -> Justification: Standard for showing part-to-whole composition.
+        - Methane GWP: Goal: Inform -> Viz: Big Number Stat (HTML/CSS) -> Justification: High impact for a critical data point.
+        - Leakage Tipping Point: Goal: Explore/Compare -> Viz: Interactive Bar Chart with Slider (Chart.js + JS) -> Justification: The core interactive element. It lets users discover the relationship between leakage and climate impact themselves, which is more memorable and effective than simply being told the numbers.
+        - Per-Capita Storage: Goal: Compare/Rank -> Viz: Bar Chart (Chart.js) -> Justification: Clearly compares Taiwan's planned capacity against regional peers.
+        - Infrastructure Growth: Goal: Inform -> Viz: Icon + Number (HTML/CSS + Unicode) -> Justification: Simple, clear visual representation of scale.
+        - Lifecycle Emissions: Goal: Compare -> Viz: Bar Chart (Chart.js) -> Justification: Provides a stark, data-driven comparison between the proposed solution (Geothermal) and the existing problem (Natural Gas).
+        - Decarbonization Pathways: Goal: Organize -> Viz: Styled Cards (HTML/CSS) -> Justification: Neatly organizes complex technical solutions into digestible chunks.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-        }
-        .tab-active {
-            border-bottom-color: #f59e0b; /* amber-500 */
-            color: #b45309; /* amber-700 */
-            font-weight: 700;
+            background-color: #f8f7f4;
+            color: #4a4a4a;
         }
         .chart-container {
             position: relative;
@@ -22,228 +33,239 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-            height: 300px;
-            max-height: 400px;
+            height: 350px;
+            max-height: 50vh;
         }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
+        .interactive-chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 60vh;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover {
+            color: #007A7A;
+            border-bottom-color: #007A7A;
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #007A7A;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #007A7A;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        .section-title-underline {
+            display: inline-block;
+            border-bottom: 4px solid #007A7A;
+            padding-bottom: 4px;
         }
     </style>
 </head>
-<body class="bg-stone-50 text-stone-800">
-    <!-- Chosen Palette: Warm Neutral Ground -->
-    <!-- Application Structure Plan: A tab-based single-page application separating the two core arguments ("Military Security" and "Environmental/Energy") for clarity and focused user engagement. The "Security" tab features an interactive HTML/CSS diagram of the area, while the "Environment" tab uses a Chart.js visualization. This structure prevents information overload and translates the user's A/B-side flyer concept into a logical, interactive web experience. -->
-    <!-- Visualization & Content Choices: 1. Proximity Risk -> Interactive HTML/CSS Diagram: To visually represent spatial threats without using static images or SVG, fulfilling technical constraints while enhancing engagement. 2. CO2 Emissions Data -> Chart.js Bar Chart: To clearly compare historical and projected data, as required. 3. Textual Arguments -> Styled Cards: To present Q&A content in a digestible, modern UI format. 4. External Links -> QR Code Placeholders: To fulfill user requirements for linking to deeper information. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<body class="antialiased">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
-
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-amber-800">基隆的十字路口：協和四接議題全解析</h1>
-            <p class="mt-2 text-stone-600">一個關乎我們家園安全與未來空氣的選擇</p>
-        </header>
-
-        <!-- Tab Navigation -->
-        <div class="mb-8 border-b border-stone-200">
-            <nav class="flex -mb-px" aria-label="Tabs">
-                <button onclick="changeTab('security')" id="tab-security" class="tab-btn tab-active w-1/2 py-4 px-1 text-center border-b-2 font-medium text-lg leading-5 focus:outline-none transition-colors duration-300 ease-in-out">
-                    軍事安全
-                </button>
-                <button onclick="changeTab('environment')" id="tab-environment" class="tab-btn text-stone-500 w-1/2 py-4 px-1 text-center border-b-2 border-transparent font-medium text-lg leading-5 hover:text-amber-600 hover:border-amber-300 focus:outline-none transition-colors duration-300 ease-in-out">
-                    環境能源
-                </button>
-            </nav>
-        </div>
-
-        <!-- Content Sections -->
-        <main>
-            <!-- Security Section -->
-            <section id="content-security" class="space-y-8">
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <p class="text-stone-700 leading-relaxed">本區旨在探討協和第四天然氣接收站（四接）的選址，如何因其與重要軍事設施及民宅的距離過近，而可能引發國防安全上的疑慮與潛在的公共安全風險。我們將透過視覺化圖表與關鍵提問，幫助您了解這個議題的嚴肅性。</p>
-                </div>
-
-                <div class="text-center">
-                    <h2 class="text-2xl md:text-3xl font-bold text-red-700">協和四接 + 軍港軍營 = 軍事焦點！</h2>
-                    <p class="mt-2 text-xl md:text-2xl text-stone-800 font-semibold">基隆港市安全可以完全不評估嗎？</p>
-                </div>
-
-                <!-- Interactive Map Diagram -->
-                <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm">
-                    <h3 class="font-bold text-lg text-center mb-4">設施相對位置示意圖</h3>
-                    <div class="relative w-full h-72 md:h-96 bg-blue-100 rounded-md overflow-hidden border-2 border-blue-300">
-                        <div class="absolute inset-0 bg-blue-100 flex items-center justify-center">
-                            <span class="text-blue-400 font-bold text-2xl opacity-50">基隆港灣區域</span>
-                        </div>
-                        
-                        <!-- LNG Tanks -->
-                        <div id="lng" class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-lg bg-red-500 text-white text-sm font-bold shadow-lg z-10 text-center">
-                            天然氣儲槽區<br>(填海造陸)
-                        </div>
-
-                        <!-- Residential Area -->
-                        <div id="homes" class="absolute top-1/3 right-[20%] p-2 rounded-lg bg-yellow-400 text-yellow-900 text-sm font-bold shadow-lg z-10">民宅</div>
-
-                        <!-- Weihai Camp -->
-                        <div id="weihai" class="absolute bottom-[20%] right-[30%] p-2 rounded-lg bg-green-600 text-white text-sm font-bold shadow-lg z-10">威海營區</div>
-
-                        <!-- Neimushan Camp -->
-                        <div id="neimu" class="absolute top-[15%] left-[15%] p-2 rounded-lg bg-green-600 text-white text-sm font-bold shadow-lg z-10">內木山營區</div>
-                        
-                        <!-- Distance Lines (Decorative) -->
-                        <div class="absolute text-xs font-semibold text-red-800" style="top: 28%; left: 55%; transform: rotate(10deg);">
-                            <span class="bg-white/70 px-1 rounded">距民宅約 0.4km</span>
-                        </div>
-                         <div class="absolute text-xs font-semibold text-red-800" style="top: 45%; right: 40%; transform: rotate(-20deg);">
-                           <span class="bg-white/70 px-1 rounded">距威海營區約 1.4km</span>
-                        </div>
-                         <div class="absolute text-xs font-semibold text-red-800" style="top: 20%; left: 35%;">
-                            <span class="bg-white/70 px-1 rounded">距內木山營區約 1.9km</span>
-                        </div>
-                    </div>
-                    <p class="text-center mt-3 text-sm text-stone-500">此為相對位置示意圖，非精確比例尺地圖。</p>
-                </div>
-
-
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
-                        <h3 class="font-bold text-lg text-red-800 mb-3">Q：台電說天然氣儲槽沒有軍事攻擊價值，你相信嗎？</h3>
-                        <p class="text-stone-700">中共「海峽雷霆」軍演釋出短片，首次模擬攻擊台天然氣接收站。這不僅是環保議題，更是你我生活安全的關鍵問題。</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500">
-                        <h3 class="font-bold text-lg text-red-800 mb-3">Q：台電說天然氣儲槽設施不會爆炸，你相信嗎？</h3>
-                        <p class="text-stone-700">馬來西亞曾發生天然氣管爆炸，導致逾百人傷亡。我們必須思考，如果接收站發生意外，基隆能承受這樣的後果嗎？</p>
-                    </div>
-                </div>
-
-                <div class="text-center p-6 bg-red-100 border border-red-200 rounded-lg">
-                    <h2 class="text-2xl font-bold text-red-800">如果接收站爆炸，我們基隆能承受嗎？</h2>
-                </div>
-                
-                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
-                    <h3 class="font-bold text-lg mb-2">想了解更多？</h3>
-                    <p class="mb-4 text-stone-600">掃描QR Code，深入了解「為什麼要反對協和四接？」的詳細資訊。</p>
-                    <img src="https://placehold.co/150x150/EEEEEE/333333?text=QR+Code%0A%E6%87%B6%E4%BA%BA%E5%8C%851" alt="QR Code for more information" class="mx-auto rounded-md">
-                    <p class="mt-2 text-xs text-stone-500">*連結至「守護外木山行動小組」臉書粉絲專頁2024/10/06貼文</p>
-                </div>
-
-            </section>
-
-            <!-- Environment Section -->
-            <section id="content-environment" class="hidden space-y-8">
-                <div class="bg-white p-6 rounded-lg shadow-sm">
-                    <p class="text-stone-700 leading-relaxed">本區旨在分析協和電廠「燃油轉燃氣」方案對環境的持續影響。即使改用天然氣，汙染排放依然存在。我們將透過數據圖表呈現未來排放量，並探討地熱發電作為真正潔淨能源替代方案的可能性，為基隆的空氣品質與永續發展尋找更佳出路。</p>
-                </div>
-
-                <div class="text-center">
-                    <h2 class="text-2xl md:text-3xl font-bold text-amber-800">燃油改燃氣仍然有汙染</h2>
-                    <p class="mt-2 text-xl md:text-2xl text-stone-800 font-semibold">協和轉地熱才有好空氣</p>
-                </div>
-                
-                <div class="bg-white p-4 md:p-6 rounded-lg shadow-sm">
-                    <h3 class="font-bold text-lg text-center mb-2">新協和電廠 CO₂ 排放量預估</h3>
-                    <p class="text-center text-sm text-stone-500 mb-4">資料來源: 環境部事業溫室氣體排放量資訊平台及協和四接環說書</p>
-                    <div class="chart-container">
-                        <canvas id="emissionsChart"></canvas>
-                    </div>
-                    <div class="text-center mt-4 p-4 bg-amber-100 border border-amber-200 rounded-lg">
-                       <p class="text-lg font-bold text-amber-900">除了溫室氣體，未來每年仍將有 <span class="text-2xl">1,221</span> 公噸的空氣汙染物排放！</p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-amber-500">
-                     <h3 class="font-bold text-xl text-amber-800 mb-4">綠電，才是基隆的未來</h3>
-                     <div class="space-y-3 text-stone-700">
-                        <p><strong class="text-green-700">✓ 台灣不缺電，缺的是「綠電」！</strong></p>
-                        <p>✓ 協和升級成<strong class="text-green-700">地熱發電</strong>，基隆能成為再生能源的領頭羊！</p>
-                        <p>✓ 新瀨海底火山發電潛力達<strong class="text-green-700">50萬瓩</strong>，是穩定可靠的在地能源。</p>
-                        <p>✓ 地熱發電不怕封鎖，能真正提升台灣的<strong class="text-green-700">能源自主</strong>！</p>
-                     </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
-                    <h3 class="font-bold text-lg mb-2">基隆值得更好的空氣</h3>
-                    <p class="mb-4 text-stone-600">掃描QR Code，了解「基隆忍受空污100年！」的完整故事。</p>
-                    <img src="https://placehold.co/150x150/EEEEEE/333333?text=QR+Code%0A%E6%87%B6%E4%BA%BA%E5%8C%852" alt="QR Code for pollution information" class="mx-auto rounded-md">
-                     <p class="mt-2 text-xs text-stone-500">*連結至「守護外木山行動小組」臉書粉絲專頁2024/10/09貼文</p>
-                </div>
-            </section>
-        </main>
-        
-        <footer class="text-center mt-12 pt-6 border-t border-stone-200">
-            <p class="font-bold">發起單位</p>
-            <p class="text-stone-600 text-sm mt-1">[請在此處列出所有發起單位名稱]</p>
-             <div class="mt-4 inline-block">
-                <img src="https://placehold.co/100x100/EEEEEE/333333?text=LINE%40+QR" alt="Official LINE@" class="mx-auto">
-                <p class="text-sm mt-1">官方LINE@</p>
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-gray-800">天然氣碳排真相</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#dilemma" class="nav-link">核心困境</a>
+                <a href="#tipping-point" class="nav-link">洩漏臨界點</a>
+                <a href="#risk" class="nav-link">台灣的風險</a>
+                <a href="#solutions" class="nav-link">解決之道</a>
             </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="hero" class="text-center py-16 md:py-24">
+            <h1 class="text-4xl md:text-6xl font-black text-[#2c3e50] mb-4 leading-tight">天然氣：減碳橋樑，還是增碳陷阱？</h1>
+            <p class="text-lg md:text-xl text-gray-500 max-w-3xl mx-auto">一份互動式報告，揭露台灣能源轉型下，天然氣背後的真實碳排挑戰。</p>
+        </section>
+
+        <section id="dilemma" class="my-16 scroll-mt-20">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4"><span class="section-title-underline">核心困境</span></h2>
+                <p class="text-gray-600">天然氣被視為潔淨能源的理想過渡方案，但其主要成分「甲烷」卻是強效溫室氣體，形成了減碳路徑上的巨大矛盾。</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card">
+                    <h3 class="font-bold text-xl text-center mb-4">🔍 承諾的「潔淨」未來</h3>
+                    <p class="text-center text-gray-600 mb-6">因燃燒時CO₂排放較低，台灣規劃在2025年，天然氣發電佔比將達到...</p>
+                    <div class="chart-container h-56 md:h-64">
+                        <canvas id="powerMixChart"></canvas>
+                    </div>
+                </div>
+                <div class="card flex flex-col items-center justify-center">
+                    <h3 class="font-bold text-xl text-center mb-4">⚠️ 隱藏的「增碳」危機</h3>
+                     <p class="text-center text-gray-600 mb-6">甲烷(CH₄)的全球暖化潛勢(GWP)在20年尺度下，是二氧化碳的：</p>
+                    <div class="text-center">
+                        <span class="text-9xl font-black text-[#e74c3c]">86</span>
+                        <span class="text-5xl font-bold text-[#c0392b]">倍</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tipping-point" class="my-16 scroll-mt-20">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4"><span class="section-title-underline">互動探索：洩漏的臨界點</span></h2>
+                <p class="text-gray-600">天然氣的溫室效應，與其供應鏈中的「甲烷洩漏率」息息相關。拖動下方的滑桿，觀察洩漏率如何影響其氣候衝擊，並找出超越燃煤的「增碳」臨界點。</p>
+            </div>
+            <div class="card">
+                <div class="interactive-chart-container">
+                    <canvas id="leakageImpactChart"></canvas>
+                </div>
+                <div class="mt-8 px-4">
+                    <label for="leakageSlider" class="block text-center font-bold text-lg">甲烷洩漏率: <span id="sliderValue" class="text-[#007A7A]">0.0%</span></label>
+                    <input id="leakageSlider" type="range" min="0" max="4" value="0" step="0.1" class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer slider mt-2">
+                </div>
+                <div id="annotation" class="text-center mt-4 h-10 text-lg font-semibold text-gray-700 transition-opacity duration-300"></div>
+            </div>
+        </section>
+
+        <section id="risk" class="my-16 scroll-mt-20">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                 <h2 class="text-3xl md:text-4xl font-bold mb-4"><span class="section-title-underline">台灣的風險：規模擴張的隱憂</span></h2>
+                <p class="text-gray-600">為了達到能源目標，台灣正大幅擴建天然氣基礎設施。這種大規模投資不僅加劇了甲烷洩漏的風險，更可能在未來面臨經濟與環境的雙重壓力。</p>
+            </div>
+             <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div class="card lg:col-span-3">
+                    <h3 class="font-bold text-xl text-center mb-4">人均儲氣量比較（規劃後）</h3>
+                    <p class="text-center text-gray-600 mb-6">擴建後，台灣的人均儲氣量將顯著高於日韓，反映出高度的能源集中與依賴。</p>
+                    <div class="chart-container">
+                        <canvas id="storageComparisonChart"></canvas>
+                    </div>
+                </div>
+                <div class="card lg:col-span-2 flex flex-col justify-center text-center">
+                    <h3 class="font-bold text-xl mb-4">基礎設施擴張藍圖 (至2032年)</h3>
+                    <div class="flex justify-around items-center my-6">
+                        <div>
+                            <p class="text-6xl">🚢</p>
+                            <p class="text-2xl font-bold text-[#007A7A]">7座</p>
+                            <p class="text-gray-500">LNG接收站</p>
+                        </div>
+                         <div>
+                            <p class="text-6xl">⛽</p>
+                            <p class="text-2xl font-bold text-[#007A7A]">49個</p>
+                            <p class="text-gray-500">儲氣槽</p>
+                        </div>
+                    </div>
+                    <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-r-lg mt-4">
+                        <h4 class="font-bold">潛在衝擊</h4>
+                        <p>過度投資高碳排設施，未來可能面臨高額「碳關稅」風險。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solutions" class="my-16 scroll-mt-20">
+             <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4"><span class="section-title-underline">解決之道：邁向真正的低碳未來</span></h2>
+                <p class="text-gray-600">要實現永續的淨零目標，不能僅依賴單一能源。我們必須多管齊下，加速發展真正的潔淨能源，並讓現有能源體系逐步去碳化。</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card">
+                    <h3 class="text-2xl font-bold text-center mb-6">策略一：發展「真正」的低碳再生能源</h3>
+                    <p class="text-center text-gray-600 mb-6">以地熱為例，其全生命週期的碳排放遠低於天然氣，可作為穩定的基載電力，且分散式的特性更能提升能源韌性。</p>
+                    <div class="chart-container">
+                        <canvas id="lifecycleEmissionsChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="text-2xl font-bold text-center mb-6">策略二：推動天然氣「去碳化」技術</h3>
+                    <div class="space-y-6">
+                        <div class="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                            <h4 class="font-bold text-lg text-[#007A7A]">碳捕捉、再利用與封存 (CCUS)</h4>
+                            <p class="text-sm text-gray-600">在碳排放到大氣前將其捕捉，封存於地底或轉化為有價值的產品。</p>
+                        </div>
+                         <div class="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                            <h4 class="font-bold text-lg text-[#007A7A]">去碳燃氫 (Methane Pyrolysis)</h4>
+                            <p class="text-sm text-gray-600">將甲烷分解為零碳的「氫氣」和固態的「碳」，氫氣可作為潔淨燃料。</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                            <h4 class="font-bold text-lg text-[#007A7A]">無碳燃料混燒/專燒</h4>
+                            <p class="text-sm text-gray-600">將現有燃氣機組改造，逐步混燒或專燒氫氣、氨等無碳燃料。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center py-12 mt-16 border-t border-gray-200">
+             <h3 class="text-2xl font-bold mb-4">務實轉型，多管齊下，實現淨零排放！</h3>
+            <p class="text-gray-500 max-w-3xl mx-auto">能源轉型之路充滿挑戰，唯有正視問題，並以多元、創新的策略應對，才能在確保能源安全的同時，走向永續的未來。</p>
         </footer>
 
-    </div>
+    </main>
 
     <script>
-        const securityTab = document.getElementById('tab-security');
-        const environmentTab = document.getElementById('tab-environment');
-        const securityContent = document.getElementById('content-security');
-        const environmentContent = document.getElementById('content-environment');
+        document.addEventListener('DOMContentLoaded', () => {
 
-        function changeTab(tabName) {
-            if (tabName === 'security') {
-                securityContent.classList.remove('hidden');
-                environmentContent.classList.add('hidden');
-                securityTab.classList.add('tab-active');
-                environmentTab.classList.remove('tab-active');
-            } else if (tabName === 'environment') {
-                securityContent.classList.add('hidden');
-                environmentContent.classList.remove('hidden');
-                securityTab.classList.remove('tab-active');
-                environmentTab.classList.add('tab-active');
-            }
-        }
+            const palette = {
+                darkBlue: '#2c3e50',
+                red: '#e74c3c',
+                lightRed: '#fdeded',
+                teal: '#007A7A',
+                lightTeal: '#e6f2f2',
+                gray: '#bdc3c7',
+                lightGray: '#ecf0f1',
+                orange: '#f39c12'
+            };
 
-        const ctx = document.getElementById('emissionsChart').getContext('2d');
-        const emissionsChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['109年度', '110年度', '111年度', '112年度', '新協和完工後'],
-                datasets: [{
-                    label: 'CO₂ 排放量 (萬公噸)',
-                    data: [182.8, 245.6, 220.5, 195.0, 623.5],
-                    backgroundColor: [
-                        'rgba(168, 162, 158, 0.6)', // stone-400
-                        'rgba(168, 162, 158, 0.6)',
-                        'rgba(168, 162, 158, 0.6)',
-                        'rgba(168, 162, 158, 0.6)',
-                        'rgba(239, 68, 68, 0.6)' // red-500
-                    ],
-                    borderColor: [
-                        'rgba(120, 113, 108, 1)', // stone-500
-                        'rgba(120, 113, 108, 1)',
-                        'rgba(120, 113, 108, 1)',
-                        'rgba(120, 113, 108, 1)',
-                        'rgba(185, 28, 28, 1)' // red-700
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
+            const defaultChartOptions = (extraOptions = {}) => ({
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
+                        position: 'top',
+                        labels: {
+                            font: { family: "'Noto Sans TC', sans-serif", size: 12 },
+                            color: '#4a4a4a'
+                        }
                     },
                     tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { family: "'Noto Sans TC', sans-serif", size: 14 },
+                        bodyFont: { family: "'Noto Sans TC', sans-serif", size: 12 },
+                        padding: 10,
+                        cornerRadius: 4,
                         callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y + ' 萬公噸';
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                  return label.join(' ');
                                 }
                                 return label;
                             }
@@ -251,23 +273,125 @@
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'CO₂ 排放量 (萬公噸)'
-                        }
+                     x: {
+                        ticks: { font: { family: "'Noto Sans TC', sans-serif" }, color: '#6a6a6a' },
+                        grid: { display: false }
                     },
-                    x: {
-                        ticks: {
-                            maxRotation: 0,
-                            minRotation: 0
-                        }
+                    y: {
+                        ticks: { font: { family: "'Noto Sans TC', sans-serif" }, color: '#6a6a6a' },
+                        grid: { color: '#e0e0e0', drawBorder: false },
+                        beginAtZero: true
                     }
+                },
+                ...extraOptions,
+            });
+
+            // Chart 1: Power Mix
+            new Chart(document.getElementById('powerMixChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['天然氣', '其他'],
+                    datasets: [{
+                        data: [50, 50],
+                        backgroundColor: [palette.teal, palette.lightGray],
+                        borderColor: '#f8f7f4',
+                        borderWidth: 4,
+                        hoverOffset: 8
+                    }]
+                },
+                options: defaultChartOptions({
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: true, position: 'bottom' },
+                        tooltip: defaultChartOptions().plugins.tooltip,
+                    }
+                })
+            });
+
+            // Chart 2: Leakage Impact (Interactive)
+            const leakageCtx = document.getElementById('leakageImpactChart');
+            const slider = document.getElementById('leakageSlider');
+            const sliderValue = document.getElementById('sliderValue');
+            const annotation = document.getElementById('annotation');
+
+            const leakageChart = new Chart(leakageCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['燃煤 (基準)', '天然氣'],
+                    datasets: [{
+                        label: '相對溫室效應',
+                        data: [100, 55], // Initial: 0% leakage
+                        backgroundColor: [palette.gray, palette.teal],
+                        barThickness: 60,
+                    }]
+                },
+                options: defaultChartOptions({
+                    plugins: { legend: { display: false }, tooltip: defaultChartOptions().plugins.tooltip },
+                    scales: { y: { ...defaultChartOptions().scales.y, max: 200 } }
+                })
+            });
+
+            function updateLeakageChart() {
+                const leakRate = parseFloat(slider.value);
+                sliderValue.textContent = `${leakRate.toFixed(1)}%`;
+                
+                // Simplified model: base impact of 55, each 1% leak adds 30 points.
+                // At 1.5% leak, impact = 55 + 1.5 * 30 = 100 (equals coal)
+                const gasImpact = 55 + (leakRate * 30);
+                leakageChart.data.datasets[0].data[1] = gasImpact;
+                
+                let annotationText = '';
+                if (leakRate >= 2.0 && leakRate <= 2.5) {
+                    annotationText = 'EDF 估計的實際洩漏區間';
+                    leakageChart.data.datasets[0].backgroundColor[1] = palette.orange;
+                } else if (leakRate >= 1.4) {
+                    annotationText = '溫室效應已大於或等於燃煤！';
+                    leakageChart.data.datasets[0].backgroundColor[1] = palette.red;
+                } else {
+                    annotationText = '溫室效應仍小於燃煤';
+                    leakageChart.data.datasets[0].backgroundColor[1] = palette.teal;
                 }
+                annotation.textContent = annotationText;
+
+                leakageChart.update();
             }
+
+            slider.addEventListener('input', updateLeakageChart);
+            updateLeakageChart();
+
+            // Chart 3: Storage Comparison
+            new Chart(document.getElementById('storageComparisonChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['日本', '韓國', '台灣 (規劃後)'],
+                    datasets: [{
+                        label: '人均儲氣量 (以日本為1倍)',
+                        data: [1, 1.7, 2.2],
+                        backgroundColor: [palette.lightGray, palette.lightGray, palette.orange],
+                    }]
+                },
+                options: defaultChartOptions({
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false }, tooltip: defaultChartOptions().plugins.tooltip }
+                })
+            });
+
+            // Chart 4: Lifecycle Emissions
+            new Chart(document.getElementById('lifecycleEmissionsChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['地熱發電', '天然氣發電'],
+                    datasets: [{
+                        label: '生命週期碳排放 (gCO₂eq/kWh)',
+                        data: [38, 490],
+                        backgroundColor: [palette.teal, palette.orange],
+                    }]
+                },
+                options: defaultChartOptions({
+                    plugins: { legend: { display: false }, tooltip: defaultChartOptions().plugins.tooltip }
+                })
+            });
         });
     </script>
-
 </body>
 </html>
